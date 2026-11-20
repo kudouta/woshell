@@ -43,6 +43,12 @@ void console_clear(void);
 int console_col(void);
 
 /**
+ * @brief 画面の桁の数
+ * @return 桁数
+ */
+int console_cols(void);
+
+/**
  * @brief 画面の行の数
  * @return 行数
  */

@@ -53,6 +53,12 @@ int cmd_mmu(uint32_t addr);
 int cmd_ramscan(uint32_t start, uint32_t end);
 
 /**
+ * @brief 魚 <o))))>< が今の行を右から左へ泳いでいく (約 3 秒。割り込みボタンで止められる)
+ * @return 0
+ */
+int cmd_wo(void);
+
+/**
  * @brief 入力の履歴を出す
  * @return 0
  */

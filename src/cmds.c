@@ -47,6 +47,7 @@ static const struct { const char *usage, *text; } help_items[] = {
     { "mmu [addr]",               "show MMU and cache state, or how addr is translated" },
     { "ramscan [start[,end]]",    "find physical RAM above MemTop (1MB steps)" },
     { "scrbench [lines]",         "measure screen read/write/move and scrolling speed" },
+    { "wo",                       "a fish swims across the line" },
     { "version",                  "show version" },
     { "reboot",                   "restart the machine (ROM)" },
 };
@@ -92,6 +93,27 @@ int cmd_mmu(uint32_t addr)
         cpu_mmu_report_addr(addr);
     else
         cpu_mmu_report();
+    return 0;
+}
+
+int cmd_wo(void)
+{
+    static const char fish[] = "<o))))><";
+    const int len = (int)sizeof fish - 1;
+    const int cols = console_cols();
+
+    /* 魚の頭の桁 x を右端から左へ 1 桁ずつ動かし、左端の外へ出たら終わる。
+       毎回、行を消してから桁を指定して描くので、シリアルに送るのも数バイトで済む */
+    for (int x = cols - 1; x > -len; x--) {
+        const int skip = x < 0 ? -x : 0;                /* 左端の外に出た部分 */
+        printf("\033[2K\033[%dG", (x < 0 ? 0 : x) + 1);
+        for (int i = skip; i < len && x + i < cols; i++)
+            console_putc(fish[i]);
+        console_flush();
+        video_wait_vsync();                             /* 2 垂直同期で 1 桁 (約 30 桁/秒) */
+        video_wait_vsync();
+    }
+    console_puts("\033[2K\r");
     return 0;
 }
 

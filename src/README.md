@@ -84,6 +84,7 @@ C では `cmd_` で始まる関数です（`cmd_help`、`cmd_d`）。シンボ�
 | `serout 0` / `serout 1` | 画面に出すものをシリアルにも出すのをやめる / 出す |
 | `scrbench [lines]` | 画面の読み書きの時間と、文字を流す速さを測る |
 | `beep [hz[,ms]]` | 音を鳴らす（省略すると 880Hz、120ms） |
+| `wo` | 魚 `<o))))><` が今の行を右から左へ泳いでいく（垂直同期 2 回で 1 桁進む。実機なら約 3 秒） |
 | `mmu [addr]` | MMU とキャッシュの状態と、変換テーブルのあらまし。アドレスを渡すと、そのアドレスの変換（`hal/README.md` の「MMU とキャッシュ」） |
 | `ramscan [start[,end]]` | 物理 RAM がどこにあるかを 1MB ごとに調べる（省略すると、ROM が見つけた RAM の次から調べる。書いた値はすぐ戻す。`hal/README.md` の「RAM の量」） |
 
@@ -128,7 +129,7 @@ shell.c ─▶ console.c ─┬─▶ VTermLib (エスケープシーケンス�
 ## 確認したこと
 
 - PC: 端末（VTermLib）の中身のテスト（`make test`。項目は `vtermlib/README.md` の「確認したこと」）
-- MAME: 起動、ROM の起動のアイコン、`help`、式と変数、`printf` でのエスケープシーケンス（太字、反転、下線、倍幅の行、線画文字）、`beep` の呼び出し、`serial`（送ったバイト数が増える）、`date`、`d`、`mmu`、`ramscan`（RAM 2MB・8MB・32MB）、バスエラーからプロンプトへの戻り、端末デモ
+- MAME: 起動、ROM の起動のアイコン、`help`、式と変数、`printf` でのエスケープシーケンス（太字、反転、下線、倍幅の行、線画文字）、`beep` の呼び出し、`serial`（送ったバイト数が増える）、`date`、`d`、`mmu`、`ramscan`（RAM 2MB・8MB・32MB）、バスエラーからプロンプトへの戻り、`wo`、端末デモ
 - このシェルの元になった、公開していない版（画面を VTermLib ではなく自前で描いていた版）で確認したこと:
   - 実機: ADB キーボード（Shift、Caps Lock、Control、繰り返し）、割り込みボタン、`reboot`、時計と PRAM
   - MAME: シリアル（9600bps、両方のポート）

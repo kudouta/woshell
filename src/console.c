@@ -50,6 +50,11 @@ int console_col(void)
     return vt_cursor_col();
 }
 
+int console_cols(void)
+{
+    return vt_cols();
+}
+
 int console_rows(void)
 {
     return vt_rows();
