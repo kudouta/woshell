@@ -404,6 +404,7 @@ static int read_char(void)
         return c;
     c = (unsigned char)*lx.p++;
     switch (c) {
+    case 'a': return 0x07;              /* BEL */
     case 'n': return '\n';
     case 't': return '\t';
     case 'r': return '\r';
