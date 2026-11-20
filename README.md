@@ -107,7 +107,7 @@ mame macse30 -printer null_modem -bitb1 socket.127.0.0.1:2333 -modem null_modem 
 | `serial` | ケーブルなしでも送信の割り込みで送り続ける（受信 0 バイト、誤り 0） |
 | `scrbench` | 画面の読み出し 17.4ms、書き込み 12.0ms、移動 22.0ms（342 行）。文字を流す速さは、シリアルにも出すと 13 行/秒（9600bps が上限）、`serout 0` で 61 行/秒 |
 | 例外からの復帰 | `(1)()`（奇数アドレスの呼び出し）でアドレスエラーを出し、プロンプトに戻る |
-| キーボード | 矢印、Control-A / E / K / U、履歴、キーリピート、Shift、Caps Lock |
+| キーボード | 矢印、Control キー（A / E / B / F / D / K / U / P / N / C / L）、履歴、キーリピート、Shift、Caps Lock |
 | 割り込みボタン | `delay`、`wo` の途中で押すとプロンプトに戻る。1 回の押下で約 12,000 回入る NMI（約 13µs ごと）を 1 回と数える |
 | `reboot` | ROM から起動し直す |
 
