@@ -784,8 +784,13 @@ static void print_value(int32_t v)
 {
     if (console_col() != 0)             /* 関数が改行せずに終わったとき */
         console_putc('\n');
-    printf("value = %d = 0x%x", (int)v, (unsigned)v);
-    if (v >= 0x20 && v <= 0x7E)
+    printf("value = %d", (int)v);
+    if (v < 0)                          /* 符号なしの値も出す (1904 年からの秒数などは 2^31 を超える) */
+        printf(" = %u", (unsigned)v);
+    printf(" = 0x%x", (unsigned)v);
+    if (v == '\'' || v == '\\')         /* C の書き方に合わせてエスケープする */
+        printf(" = '\\%c'", (int)v);
+    else if (v >= 0x20 && v <= 0x7E)
         printf(" = '%c'", (int)v);
     console_putc('\n');
 }
@@ -807,7 +812,7 @@ void shell_exec(const char *line)
         if (s)
             printf(" (%s+0x%x)", s->name, (unsigned)(ti.pc - s->addr));
         if (ti.has_addr)
-            printf(", address 0x%08x", (unsigned)ti.addr);
+            printf("\n  address 0x%08x", (unsigned)ti.addr);   /* 1 行に収まらないので次の行に */
         console_putc('\n');
         return;
     }

@@ -33,7 +33,7 @@ void trap_fatal(const struct trap_info *info)
     if (s)
         printf(" (%s+0x%x)", s->name, (unsigned)(info->pc - s->addr));
     if (info->has_addr)
-        printf(", address 0x%08x", (unsigned)info->addr);
+        printf("\n  address 0x%08x", (unsigned)info->addr);
     printf("\nsystem halted.\n");
     console_flush();
 }

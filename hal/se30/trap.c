@@ -3,7 +3,11 @@
  * @brief 例外の処理 (trap.h, trapent.S)
  *
  * 68030 の例外のフレーム: +0 SR (2 バイト), +2 PC (4), +6 形式 (上位 4 ビット) とベクタの位置 (下位 12 ビット)。
- * 形式 $A / $B (バスエラー, アドレスエラー) は +$10 にデータのアドレス (触ろうとしたアドレス) がある。
+ * 形式 $A / $B (バスエラー, アドレスエラー) は、+$0A の SSW (特別な状態の語) で、どのアクセスで起きたかがわかる。
+ *   DF (ビット 8): データのアクセス。触ろうとしたアドレスは +$10 にある
+ *   FB / FC (ビット 14 / 15): 命令の読み込み (パイプラインのステージ B / C)。ステージ B のアドレスは、
+ *       形式 $B なら +$24 にあり、形式 $A なら PC + 4。ステージ C はステージ B の 2 バイト前
+ * どれも立っていなければ、触ろうとしたアドレスはフレームに残っていない (+$10 の値は意味がない)。
  */
 #include "trap.h"
 
@@ -23,8 +27,19 @@ int trap_exc_handler(const uint8_t *frame)
     info.vector = vector;
     info.sr = rd16(frame);
     info.pc = rd32(frame + 2);
-    info.has_addr = format == 0xA || format == 0xB;
-    info.addr = info.has_addr ? rd32(frame + 0x10) : 0;
+    info.has_addr = 0;
+    info.addr = 0;
+    if (format == 0xA || format == 0xB) {
+        const uint16_t ssw = rd16(frame + 0x0A);
+        if (ssw & 0x0100) {                         /* DF: データのアクセス */
+            info.has_addr = 1;
+            info.addr = rd32(frame + 0x10);
+        } else if (ssw & 0xC000) {                  /* FC / FB: 命令の読み込み */
+            const uint32_t stage_b = format == 0xB ? rd32(frame + 0x24) : info.pc + 4;
+            info.has_addr = 1;
+            info.addr = (ssw & 0x8000) ? stage_b - 2 : stage_b;   /* C のほうが先の命令 */
+        }
+    }
 
     if (!trap_armed) {
         if (vector == 31)       /* 構えていないときの割り込みボタンは無視する */

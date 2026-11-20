@@ -329,7 +329,7 @@ int cmd_scrbench(int lines)
 
     t0 = timer_now();
     for (int i = 0; i < lines; i++)
-        printf("scroll test line %4d  0123456789 abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ\n", i);
+        printf("scroll %4d     0123456789 abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ\n", i);  /* 80 文字 */
     console_flush();
     uint32_t t_scroll = timer_now() - t0;
 
@@ -356,7 +356,9 @@ int cmd_d(uint32_t addr, int n, int width)
         n = 128 / d_width;
     const uint32_t start = d_next;
     uint32_t end = start + (uint32_t)n * (uint32_t)d_width;
-    for (uint32_t line = start & ~15u; line < end; line += 16) {
+    /* 行は 16 バイトごと。start が幅の倍数でないときは、行の先頭もその分ずらして、start の値が欄に入るようにする */
+    const uint32_t off = start & (uint32_t)(d_width - 1);
+    for (uint32_t line = ((start - off) & ~15u) + off; line < end; line += 16) {
         printf("%08x:  ", (unsigned)line);
         char ascii[17];
         for (int i = 0; i < 16; i += d_width) {

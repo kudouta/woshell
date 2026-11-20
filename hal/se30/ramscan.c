@@ -154,6 +154,6 @@ void platform_ram_scan(uint32_t start, uint32_t end)
     }
     /* 合計の見積もり: 調べ始めより下は、ROM が見つけた分 (MemTop まで) があるとみなす */
     const uint32_t below = start < in_use ? start : in_use;
-    printf("RAM found above %08x: %u MB (not counting mirrors). total with RAM below: about %u MB\n",
+    printf("RAM above %08x: %u MB (mirrors not counted), about %u MB in total\n",
            (unsigned)start, (unsigned)total, (unsigned)(total + (below >> 20)));
 }

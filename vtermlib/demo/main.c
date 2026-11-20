@@ -30,7 +30,7 @@ void trap_fatal(const struct trap_info *info)
     printf(CSI "m\n\nfatal exception: %s (vector %d) at pc 0x%08x",
            trap_name(info->vector), info->vector, (unsigned)info->pc);
     if (info->has_addr)
-        printf(", address 0x%08x", (unsigned)info->addr);
+        printf("\n  address 0x%08x", (unsigned)info->addr);
     printf("\nsystem halted.\n");
     vt_flush();
 }
