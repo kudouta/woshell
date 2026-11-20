@@ -1,0 +1,8 @@
+# ビルドの結果
+build/
+vtermlib/build/
+hal/build/
+libc/build/
+
+# MAME の実行で作られるもの。ROM は著作物なので絶対に入れない
+mame/
