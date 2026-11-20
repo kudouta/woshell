@@ -13,7 +13,7 @@ Macintosh SE/30 専用のベアメタル実装評価用に作った簡易shell�
 
 ## 必要なもの
 
-Windows 11 の WSL（Ubuntu 22.04 以降）で確かめています。Linux の実機でも、おそらく同じように作業できます（`wsl make` の代わりに `make` を実行します）。
+Windows 11 の WSL（Ubuntu 22.04 以降）で確認しています。Linux の実機でも、おそらく同じように作業できます（`wsl make` の代わりに `make` を実行します）。
 
 - WSL の Ubuntu
 - MAME（`macse30` が動くもの）。`mame` の名前で起動できるようにしておきます
@@ -60,7 +60,7 @@ wsl make -C vtermlib    # 端末デモ vtermlib/build/vterm1440.img を生成
 |---|---|---|
 | `CROSS` | `m68k-linux-gnu-` | クロスコンパイラーの接頭辞 |
 | `MACHINE` | `se30` | 機種（`hal/<機種>` を使う）。`se30` 固定 |
-| `FONT` | `assets/font/vt6x12.txt` | 端末で使用するフォント定義（テキスト）。`vtermlib/` からの場所で書く。文字の大きさが変わると、画面の桁数と行数も変わる |
+| `FONT` | `assets/font/vt6x12.txt` | 端末で使用するフォント定義（テキスト）。`vtermlib/` からの相対パスで書く。文字の大きさが変わると、画面の桁数と行数も変わる |
 | `EXTRA_CFLAGS` | なし | 追加のコンパイラーオプション |
 | `HOSTCC` | `gcc` | `make test` で使うホストコンパイラー |
 
@@ -68,18 +68,18 @@ wsl make -C vtermlib    # 端末デモ vtermlib/build/vterm1440.img を生成
 
 | ファイル | 内容 |
 |---|---|
-| `build/woshell1440.img` | 1.44MB のフロッピーイメージ（起動ブロック + プログラム） |
+| `build/woshell1440.img` | 1.44MB のフロッピーイメージ（ブートブロック + プログラム） |
 | `build/stage2.elf` | リンクしたプログラム。`-g` 付き（gdb、addr2line、`objdump -S` 用） |
 | `build/stage2.bin` | フロッピーに入れるプログラム（`stage2.elf` から情報を落としたもの） |
 | `build/stage2.lst` | 逆アセンブルとソースを並べたもの |
 | `build/syms.txt` | シンボルの一覧（`nm` の結果） |
 | `hal/build/libse30.a`、`crt0.o`、`boot.bin` | SE/30依存レイヤー、スタートアップ（エントリーポイント）、ブートブロック |
-| `vtermlib/build/libvterm.a` | 端末のライブラリー（フォントも入る） |
+| `vtermlib/build/libvterm.a` | 端末ライブラリー（フォントも入る） |
 | `libc/build/libc.a` | 自前の小さな C ライブラリー |
 
 ## 動かすときの補足
 
-- **MAME**: `mame macse30` はこのフォルダーの `macse30.ini` を読み、`build/woshell1440.img` をフロッピーに入れて起動します。端末のデモは `mame macse30 -flop1 vtermlib/build/vterm1440.img` で動きます。
+- **MAME**: `mame macse30` はこのフォルダーの `macse30.ini` を読み、`build/woshell1440.img` をフロッピーに入れて起動します。端末デモは `mame macse30 -flop1 vtermlib/build/vterm1440.img` で動きます。
 - **実機**: 書いたフロッピーは Windows からは読めない形式になります。一度も初期化していないディスクは書けないことがあるので、先に Windows で初期化しておきます。
 
 MAME の SE/30 は音源（ASC）が「不完全」とされていて、起動の前に警告の画面が出ます。`ui.ini` の設定で、14 日以内に一度見ていれば出さないようにしてあります。
@@ -92,14 +92,14 @@ mame macse30 -printer null_modem -bitb1 socket.127.0.0.1:2333 -modem null_modem 
 
 ## build時の注意
 
-1. `stage2.elf` から `stage2.bin` を作り、`hal/tools/se30/mkfloppy.py` で起動ブロックと一緒にフロッピーイメージにします。
-2. リンクの順は `crt0.o`、shell、シンボルテーブル、`-lvterm -lse30 libc/build/libc.a -lgcc` です。`libvterm` は `libse30` を使い、どれも `libc` を使います。`libc.a` を `-lc` でなくファイルの場所で渡すわけは `libc/README.md` にあります。
+1. `stage2.elf` から `stage2.bin` を作り、`hal/tools/se30/mkfloppy.py` でブートブロックと一緒にフロッピーイメージにします。
+2. リンクの順は `crt0.o`、shell、シンボルテーブル、`-lvterm -lse30 libc/build/libc.a -lgcc` です。`libvterm` は `libse30` を使い、どれも `libc` を使います。`libc.a` を `-lc` でなくパスで渡すわけは `libc/README.md` にあります。
 
 **シンボルテーブル**: シェルからプログラムの関数や変数を名前で呼べるよう、シンボル（`nm` の T / D / B / R）をテーブルにしてプログラムに入れます。テーブルを入れると大きさが変わってアドレスがずれるので、次のように 3 回リンクします。
 
 1. 空のテーブルでリンクし、シンボルの名前を集めます。
 2. 1 の名前でテーブルを作ってリンクします（テーブルの大きさは最後と同じになります。ただしテーブルに入るアドレスは、まだ 1 のリンクのものです）。
-3. 2 のアドレスでテーブルを作ってリンクします。2 と 3 のアドレスが同じことを確かめ、違えば止まります。
+3. 2 のアドレスでテーブルを作ってリンクします。2 と 3 のアドレスが同じことを確認し、違えば止まります。
 
 テーブルは `tools/common/mksymtab.py` が作ります。`cmd_` で始まる関数は、`cmd_` を外した名前でもテーブルに入ります。
 
@@ -120,8 +120,8 @@ libc/      自前の小さな C ライブラリー (どのレイヤーからも�
 | フォルダー | 内容 |
 |---|---|
 | `src/` | シェル。くわしくは `src/README.md` |
-| `vtermlib/` | 端末のライブラリー、フォント、デモ、PC のテスト。くわしくは `vtermlib/README.md` |
-| `hal/` | インターフェースのヘッダー（`hal/include`）、SE/30 の実装（`hal/se30`）、68030 の部分（`hal/m68030`）、フロッピーを作る・書く道具（`hal/tools/se30`）。くわしくは `hal/README.md` |
+| `vtermlib/` | 端末ライブラリー、フォント、デモ、PC のテスト。くわしくは `vtermlib/README.md` |
+| `hal/` | インターフェースのヘッダー（`hal/include`）、SE/30 の実装（`hal/se30`）、68030 の部分（`hal/m68030`）、フロッピーを作る・書くツール（`hal/tools/se30`）。くわしくは `hal/README.md` |
 | `libc/` | `memcpy` / `memset`（GCC が呼ぶので要る）と `printf` / `sprintf`。くわしくは `libc/README.md` |
 | `tools/common/` | `mksymtab.py`（シンボルテーブルを作る）、`serterm.py`（MAME のシリアルにつなぐ端末） |
 | `macse30.ini`、`ui.ini` | MAME の設定（場所はこのフォルダーからの相対） |
@@ -138,15 +138,15 @@ libc/      自前の小さな C ライブラリー (どのレイヤーからも�
 - 外から見える名前（`static` でない関数と変数）は `モジュール名_` で始めます。モジュール名はファイル名にそろえます（`vtdraw.c` なら `vtdraw_`）。
 - 機種に依存しないインターフェース（`hal/include/*.h`）の関数は、インターフェースの名前で始めます（`video_`、`keyboard_`、`timer_`、`beep_`、`platform_`、`serial_`、`rtc_`）。実装がどのファイルにあってもこの名前にします（`timer_now` は `via.c`、`platform_irq_count` は `irq.c`）。
 - SE/30 の中だけで使うものは、その部品の名前で始めます（`via_`、`irq_`、`adb_`、`asc_`、`trap_`）。
-- マクロと定数は大文字で、同じ頭を付けます（`VTCORE_COLS`、`VTCORE_ATTR_BOLD`、`KEYBOARD_UP`）。型も同じ頭を付けます（`struct vtcore_cell`）。
+- マクロと定数は大文字で、同じ接頭辞を付けます（`VTCORE_COLS`、`VTCORE_ATTR_BOLD`、`KEYBOARD_UP`）。型も同じ接頭辞を付けます（`struct vtcore_cell`）。
 - アセンブラーのエントリーは `モジュール名_…_entry` にします（`trap_exc_entry`、`irq_level1_entry`）。
 - `#define` の値は、数 1 つでもかっこでくくります（`#define VIA_IRQ_SR (0x04)`、`#define VTCORE_COLS (VIDEO_W / FONT_W)`）。アセンブラー（`.S`）の定義も同じです。かっこでくくらない例外は次のものです。
   - 文字列（つなげて使うので、かっこを付けると壊れる。`#define MACHINE_NAME "SE/30"`）
   - 属性や名前を作るマクロ
   - 値のない印
   - 文の形のマクロ
-- `static` の関数と変数には頭を付けません。名前は小文字とアンダースコアで付けます。
-- 頭を付ける決まりの例外: C の標準の名前（`printf`、`memcpy`、`malloc`、`main` など）と、Mac のローメモリ変数（`MemTop`、`ROMBase` など。Inside Macintosh の名前のまま）
+- `static` の関数と変数には接頭辞を付けません。名前は小文字とアンダースコアで付けます。
+- 接頭辞を付けるルールの例外: C の標準の名前（`printf`、`memcpy`、`malloc`、`main` など）と、Mac のローメモリ変数（`MemTop`、`ROMBase` など。Inside Macintosh の名前のまま）
 - 使う側が用意する関数は、それが属するインターフェースの名前で始めます（`trap_fatal`、`fmt_putc`、`serial_irq`）。
 
 **シェルのコマンド**

@@ -1,8 +1,8 @@
-# VTermLib — VT102 相当の文字端末のライブラリー
+# VTermLib — VT102 相当の文字端末ライブラリー
 
 エスケープシーケンスを混ぜた文字を出すだけで画面を操れる、コンソールのライブラリー（静的ライブラリー `.a`）です。カーソル移動、消去、文字の飾り、スクロール範囲、倍幅・倍高の行などが使えます。DEC VT102 の動きに、xterm のよく使われる機能を少し足したものです。シリアルでつなぐ端末とは違い、端末から見た「ホスト」は、このライブラリーを使うプログラム自身になります。
 
-機種には依存しません。画面、キーボード、時計、ベルは、機種の層（`../hal`）のインターフェースのヘッダー（`video.h`、`keyboard.h`、`timer.h`、`beep.h`）を通して使います。
+機種には依存しません。画面、キーボード、時計、ベルは、機種のレイヤー（`../hal`）のインターフェースのヘッダー（`video.h`、`keyboard.h`、`timer.h`、`beep.h`）を通して使います。
 
 使えるもの:
 
@@ -16,16 +16,16 @@
 | 作るもの | 内容 |
 |---|---|
 | `build/libvterm.a` | 端末。`vt.o`、`vtcore.o`、`vtdraw.o`。フォントもここに入る |
-| `build/vterm1440.img` | デモ。`demo/main.c` を、`libvterm.a`、機種の層の `libse30.a`、`libc.a` とリンクしたもの |
+| `build/vterm1440.img` | デモ。`demo/main.c` を、`libvterm.a`、機種のレイヤーの `libse30.a`、`libc.a` とリンクしたもの |
 
 ## 作り方
 
 Linux では `make`、Windows では `wsl make` のように WSL から、このフォルダーで実行します。
 
 ```
-make                # ライブラリーとデモ (build/vterm1440.img, 1.44MB のフロッピー。機種の層と libc も作る)
+make                # ライブラリーとデモ (build/vterm1440.img, 1.44MB のフロッピー。機種のレイヤーと libc も作る)
 make lib            # ライブラリーだけ
-make test           # PC で端末の中身を確かめる
+make test           # PC で端末の中身を確認する
 ```
 
 実機で動かすときは、このフォルダーで、Windows の管理者のコマンドプロンプトから `python ../hal/tools/se30/writefloppy.py build/vterm1440.img` を実行してフロッピーに書きます。
@@ -65,10 +65,10 @@ stage2.elf: main.o
 ```
 
 - `LDFLAGS` には `-nostdlib -static -no-pie -Wl,--defsym=LOAD_ADDR=0x80000` が要ります（`stage2.ld` が `LOAD_ADDR` を使います）。
-- **並べる順**: `-lvterm -lse30 libc/build/libc.a -lgcc`（libvterm は機種の層の関数を使い、どちらも `memcpy` などを使います）。`libc.a` をファイルの場所で渡すわけは `../libc/README.md` にあります。
+- **並べる順**: `-lvterm -lse30 libc/build/libc.a -lgcc`（libvterm は機種のレイヤーの関数を使い、どちらも `memcpy` などを使います）。`libc.a` をパスで渡すわけは `../libc/README.md` にあります。
 - **呼ぶ順**: `platform_init()` → `keyboard_init()` → `beep_init()` → `vt_init()`
 - `printf`（`../libc`）を端末に出すには、`fmt_putc`（`fmt.h`）を用意し、その中で `vt_putc` を呼びます（`demo/main.c` を参照）。
-- 機種の層の使い方（`trap_fatal` を用意することなど）は `../hal/README.md` にあります。
+- 機種のレイヤーの使い方（`trap_fatal` を用意することなど）は `../hal/README.md` にあります。
 
 ## プログラムから呼ぶ関数
 
@@ -196,11 +196,11 @@ underline 11       ; 下線を引く行
 
 | ファイル | 内容 |
 |---|---|
-| `src/vtcore.c` | 端末の中身。文字の流れを 1 バイトずつ解釈する状態の機械と、文字の表。画面には触らない（PC でも動く） |
+| `src/vtcore.c` | 端末の中身。文字の流れを 1 バイトずつ解釈するステートマシンと、文字の表。画面には触らない（PC でも動く） |
 | `src/vtdraw.c` | 文字の表を画面にする |
 | `src/vt.c` | インターフェース（`vt.h`）。中身、描く側、キーボード、ベルをつなぐ |
 | `demo/main.c` | デモ |
-| `tests/test_vt.c` | PC で中身を確かめる（`make test`） |
+| `tests/test_vt.c` | PC で中身を確認する（`make test`） |
 | `tools/common/vtfont.py` | テキストのフォントを `build/font.h` にする |
 
 - **文字の表**は画面 2 枚分（通常と代わりの画面）です。行は番号の表（map）で引くので、スクロールは番号を回すだけで済みます。
@@ -233,14 +233,14 @@ underline 11       ; 下線を引く行
 
 実機ではまだ測っていません。
 
-## 確かめたこと
+## 確認したこと
 
 - `make test`: 77 項目すべて通ります（折り返し、DECAWM、カーソル移動、消去、挿入と削除、スクロール範囲、DECOM、タブ、属性、文字の組、倍幅、DECALN、代わりの画面、DECSC、文字列の読み捨て、CAN、REP、ベル、キー、返事、RIS）。
-- MAME: デモの全項目を画面の保存で確かめました（キーの画面は打ったキーと、DA・カーソル位置・大きさの返事まで）。
+- MAME: デモの全項目をスクリーンショットで確認しました（キーの画面は打ったキーと、DA・カーソル位置・大きさの返事まで）。
 - **実機ではまだ動かしていません**（ベルの音、スムーズスクロールの見え方、速さ）。
 
 ## 次にできること
 
-- 実機で確かめる（デモの 9 の速さ、スムーズスクロール、ベル）
+- 実機で確認する（デモの 9 の速さ、スムーズスクロール、ベル）
 - シリアルにつないで本物の端末として使う
 - 組み立てをさらに速くする（左の余白の分のずらしを、詰める処理の中で一緒に行う、など）

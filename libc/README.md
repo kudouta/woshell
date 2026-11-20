@@ -5,7 +5,7 @@ C の標準ライブラリーのうち、今使っている関数だけを自前
 | ファイル | 関数 | 理由 |
 |---|---|---|
 | `src/mem.c` | `memcpy`、`memset` | GCC は `-ffreestanding` でも、構造体のコピーや大きな配列の初期化をこれらの呼び出しに置き換えることがある。C の標準ライブラリーをリンクしないので、自前で用意する |
-| `src/fmt.c`、`src/fmt.h` | `printf`、`vprintf`、`sprintf`、`vsprintf` | 書式付きの表示。出力先は、使う側が `fmt_putc` を用意して決める（woshell は画面とシリアル、端末のデモは端末） |
+| `src/fmt.c`、`src/fmt.h` | `printf`、`vprintf`、`sprintf`、`vsprintf` | 書式付き出力。出力先は、使う側が `fmt_putc` を用意して決める（woshell は画面とシリアル、端末デモは端末） |
 
 Linux では `make`、Windows では `wsl make` のように WSL から、このフォルダーで実行します。
 
@@ -13,8 +13,8 @@ Linux では `make`、Windows では `wsl make` のように WSL から、この
 make                # build/libc.a
 ```
 
-- 使う側は `src/` をインクルードの場所に入れ、`build/libc.a` をライブラリーの並びで `-lgcc` のすぐ前（実質の最後）に置きます。
-- クロスコンパイラーにも同じ名前の `libc.a`（Linux 用）があるので、`-lc` ではなくファイルの場所（`libc/build/libc.a`）で指定します。
+- 使う側は `src/` をインクルードパスに入れ、`build/libc.a` をリンク順で `-lgcc` のすぐ前（実質の最後）に置きます。
+- クロスコンパイラーにも同じ名前の `libc.a`（Linux 用）があるので、`-lc` ではなくパス（`libc/build/libc.a`）で指定します。
 - `printf` で使える書式: `%d %i %u %x %X %o %c %s %p %%`、フラグ `-` `0`、幅（数字か `*`）、精度（`%s` だけ）。`l` `h` は読み飛ばします（int と long はどちらも 32 ビット）。
 - `memmove` と `memcmp` は、今は GCC が呼んでいないので入れていません。必要になったらここに足します。
 - 64 ビットの割り算（`__udivdi3` など）は、クロスコンパイラーに付いてくる `libgcc`（`-lgcc`）が持っています。
