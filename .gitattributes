@@ -1,0 +1,2 @@
+# 改行はどの環境でも LF にする (WSL の make やスクリプトが CRLF で動かなくなるのを防ぐ)
+* text=auto eol=lf
