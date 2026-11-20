@@ -189,9 +189,14 @@ underline 11       ; 下線を引く行
 ## しくみ
 
 ```
-プログラム ─ vt_putc ─▶ vtcore.c ──(文字の表, 行の印)──▶ vtdraw.c ──▶ shadow (RAM) ──▶ VRAM
-            ◀ vt_getc ─  (解釈)                         (組み立て)            (カーソル, 反転を重ねる)
-キーボード ─ keyboard_getc ─▶ vtcore_key (キー → バイト列)
+program  -- vt_putc -->  vtcore.c  -->  vtdraw.c  -->  shadow (RAM)  -->  VRAM
+program  <-- vt_getc --  vtcore.c
+keyboard -- keyboard_getc -->  vtcore_key
+
+vtcore.c      文字の流れを解釈し、文字の表と行の印 (変わった行) を持つ
+vtdraw.c      変わった行を shadow に組み立てる
+VRAM          shadow を写すときに、カーソルと画面全体の反転を重ねる
+vtcore_key    キーをバイト列 (ESC [ A など) にする
 ```
 
 | ファイル | 内容 |

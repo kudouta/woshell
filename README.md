@@ -105,7 +105,7 @@ mame macse30 -printer null_modem -bitb1 socket.127.0.0.1:2333 -modem null_modem 
 | `date`、`setdate` | OK。電池が切れているので、電源を入れると 1904-01-01 から数え始める |
 | `pram`、`pramw` | OK。`reboot` しても値は残る。電源を切ると ROM の初期値に戻る |
 | `serial` | ケーブルなしでも送信の割り込みで送り続ける（受信 0 バイト、誤り 0） |
-| `scrbench` | 画面の読み出し 17.4ms、書き込み 12.0ms、移動 22.0ms（342 行）。文字を流す速さは、シリアルにも出すと 13 行/秒（9600bps が上限）、`serout 0` で 61 行/秒 |
+| `scrbench` | 画面の読み出し 17.4ms、書き込み 12.0ms、移動 22.0ms（342 行）。文字を流す速さは、シリアルにも出すと 13 行/秒（9600bps が上限）、`serout 0` で 61 行/秒（このときのテストの行は 87 文字で、2 行に折り返していた。今は 80 文字） |
 | 例外からの復帰 | `(1)()`（奇数アドレスの呼び出し）でアドレスエラーを出し、プロンプトに戻る |
 | キーボード | 矢印、Control キー（A / E / B / F / D / K / U / P / N / C / L）、履歴、キーリピート、Shift、Caps Lock |
 | 割り込みボタン | `delay`、`wo` の途中で押すとプロンプトに戻る。1 回の押下で約 12,000 回入る NMI（約 13µs ごと）を 1 回と数える |
@@ -136,13 +136,13 @@ mame macse30 -printer null_modem -bitb1 socket.127.0.0.1:2333 -modem null_modem 
 上位のレイヤーは、下位のレイヤーのヘッダーのみを使います。
 
 ```
-src/       シェル                                                       → build/woshell1440.img
-  │
-vtermlib/  VT102 相当の端末 (機種に依存しない)                          → libvterm.a
-  │
-hal/       機種のレイヤー (インターフェースのヘッダーと SE/30 の実装)   → libse30.a, crt0.o, boot.bin
+src/       -> build/woshell1440.img         シェル
+  |
+vtermlib/  -> libvterm.a                    VT102 相当の端末 (機種に依存しない)
+  |
+hal/       -> libse30.a, crt0.o, boot.bin   機種のレイヤー (インターフェースのヘッダーと SE/30 の実装)
 
-libc/      自前の小さな C ライブラリー (どのレイヤーからも使う)         → libc.a
+libc/      -> libc.a                        自前の小さな C ライブラリー (どのレイヤーからも使う)
 ```
 
 | フォルダー | 内容 |
