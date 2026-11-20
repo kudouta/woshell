@@ -1,6 +1,6 @@
 /**
  * @file timer.h
- * @brief 時計 (機種に依存しない入口)
+ * @brief 時計 (機種に依存しないインターフェース)
  */
 #ifndef INCLUDE_TIMER_H
 #define INCLUDE_TIMER_H

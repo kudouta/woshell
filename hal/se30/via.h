@@ -2,7 +2,7 @@
  * @file via.h
  * @brief SE/30 の VIA (6522) と時計 (SE/30 の中だけで使う)
  *
- * VIA1 の番地はローメモリ変数 VIA ($01D4) から取る。VIA2 は VIA1 の $2000 先
+ * VIA1 のアドレスはローメモリ変数 VIA ($01D4) から取る。VIA2 は VIA1 の $2000 先
  * (MAME の macii.cpp: VIA1 $50F00000, VIA2 $50F02000)。レジスタは $200 おき。
  * VIA のクロックは C7M/10 = 783.36kHz (1 カウント 約 1.277us)。
  */
@@ -60,7 +60,7 @@ static inline void via_w(volatile uint8_t *via, uint32_t reg, uint8_t v)
 }
 
 /**
- * @brief VIA の番地を決め、ROM が有効にした割り込みを止め、時計 (タイマ2) を回し始める
+ * @brief VIA のアドレスを決め、ROM が有効にした割り込みを止め、時計 (タイマ2) を回し始める
  *
  * platform_init の最初に呼ぶ。
  */

@@ -1,6 +1,6 @@
 /**
  * @file beep.h
- * @brief 短い音 (機種に依存しない入口)。端末のベル (BEL, Ctrl-G) に使う
+ * @brief 短い音 (機種に依存しないインターフェース)。端末のベル (BEL, Ctrl-G) に使う
  */
 #ifndef INCLUDE_BEEP_H
 #define INCLUDE_BEEP_H

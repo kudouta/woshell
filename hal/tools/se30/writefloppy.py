@@ -5,11 +5,11 @@
   (--yes: 書き込む前の確認を省く, --no-pause: 最後に Enter を待たない)
 
 管理者として開いたコマンドプロンプトか PowerShell で実行する。
-書き込む前に次を確かめ、どれかが違えば何もせずに終わる:
+書き込む前に次を確認し、どれかが違えば何もせずに終わる:
   - ドライブが A: か B: で、取り外しのできるドライブであること
   - 入っているディスクが 1.44MB (3.5 インチ, 512 バイト x 18 セクタ x 2 面 x 80 トラック) であること
   - イメージがちょうど 1,474,560 バイトであること
-書き込んだあと読み戻して、イメージと同じか確かめる。
+書き込んだあと読み戻して、イメージと同じか確認する。
 最後に「結果: 成功」か「結果: 失敗」を表示し、Enter を押すまでウィンドウを閉じない。
 ディスクの中身はすべて上書きされ、Windows からは読めないディスクになる (SE/30 の起動用)。
 一度も初期化していない新しいディスクは書けないことがあるので、先に Windows で初期化 (フォーマット) しておく。
@@ -87,7 +87,7 @@ def ioctl(h, code, out=None):
 
 
 def verify(h, image):
-    """ディスクを先頭から読み、イメージと同じか確かめる"""
+    """ディスクを先頭から読み、イメージと同じか確認する"""
     n = wintypes.DWORD()
     if not k32.SetFilePointerEx(h, 0, None, 0):
         fail("ディスクの先頭へ戻れない")
@@ -114,7 +114,7 @@ def run(path, letter, verify_only, ask):
     h = k32.CreateFileW("\\\\.\\" + letter + ":", access, FILE_SHARE_READ | FILE_SHARE_WRITE, None,
                         OPEN_EXISTING, 0, None)
     if h == INVALID_HANDLE_VALUE or h is None:
-        fail(f"{letter}: を開けない (管理者として実行しているか、ディスクが入っているか確かめる)")
+        fail(f"{letter}: を開けない (管理者として実行しているか、ディスクが入っているか確認する)")
     try:
         geo = DiskGeometry()
         if not ioctl(h, IOCTL_DISK_GET_DRIVE_GEOMETRY, geo):
@@ -136,7 +136,7 @@ def run(path, letter, verify_only, ask):
                 fail("中止しました", False)
 
         if not ioctl(h, FSCTL_LOCK_VOLUME):
-            fail(f"{letter}: をほかのプログラムから切り離せない (エクスプローラーなどで開いていないか確かめる)")
+            fail(f"{letter}: をほかのプログラムから切り離せない (エクスプローラーなどで開いていないか確認する)")
         ioctl(h, FSCTL_DISMOUNT_VOLUME)    # Windows が覚えているファイルシステムの情報を捨てる
 
         n = wintypes.DWORD()
@@ -148,7 +148,7 @@ def run(path, letter, verify_only, ask):
         print()
         verify(h, image)
         ioctl(h, FSCTL_UNLOCK_VOLUME)
-        return f"{letter}: に書き込み、読み戻して同じことを確かめました。SE/30 に入れて電源を入れてください"
+        return f"{letter}: に書き込み、読み戻して同じことを確認しました。SE/30 に入れて電源を入れてください"
     finally:
         k32.CloseHandle(h)
 

@@ -16,10 +16,10 @@
  *   レベル4 (SCC): シリアル。最初は SCC の割り込みを止めておく。入ったら serial_irq (serial.c) に渡し、
  *       処理されなければ要因 (RR3) を残してもう一度止める
  *   レベル5, 6: SE/30 ではつながっていない。数えるだけ
- *   レベル7 (ベクタ 31): 割り込みボタン (NMI)。例外と同じ入口 (trapent.S) に入れ、
- *       trap_catch で構えていればそこへ戻る (構えていなければ trap.c が無視する)。入口は trap_nmi_entry で、
+ *   レベル7 (ベクタ 31): 割り込みボタン (NMI)。例外と同じエントリー (trapent.S) に入れ、
+ *       trap_catch で構えていればそこへ戻る (構えていなければ trap.c が無視する)。エントリーは trap_nmi_entry で、
  *       1 回の押下で続けて入る NMI (実機で 2 万回以上) をまとめ、押下ごとに 1 回だけ trap_exc_entry へ進む
- * 例外 (バスエラーなど) も trapent.S の入口に入れる。
+ * 例外 (バスエラーなど) も trapent.S のエントリーに入れる。
  *
  * 処理する相手がない要因が入ったら、要因を消して数える。
  * レベル3/5/6 は要因を消す方法がないので、もし入り続けると戻れない (割り込みボタンでは抜けられる)。
@@ -48,7 +48,7 @@ static volatile uint32_t unhandled_detail[PLATFORM_IRQ_LEVELS];
 #define SCC_RR3     (3)             /* 割り込みの要因 (A でだけ読める) */
 static volatile uint8_t *scc;
 
-/* 入口 (vectors.S, trapent.S) */
+/* エントリー (vectors.S, trapent.S) */
 extern void irq_spurious_entry(void);
 extern void irq_level1_entry(void);
 extern void irq_level2_entry(void);
@@ -143,7 +143,7 @@ void irq_init(void)
 void irq_enable(void)
 {
     /* 垂直同期の割り込み。ROM のときに出た割り込みが残っているので、許可する前に一度下げる
-       (下げないと CA1 に「下がる」が来ず、割り込みが入らない。実機で確かめた) */
+       (下げないと CA1 に「下がる」が来ず、割り込みが入らない。実機で確認した) */
     vsync_ack();
     via_w(via_2, VIA_IFR, VIA_IRQ_CA1);
     via_w(via_2, VIA_IER, VIA_IRQ_SET | VIA_IRQ_CA1);

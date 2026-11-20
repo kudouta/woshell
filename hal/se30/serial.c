@@ -7,7 +7,7 @@
  * (MAME の macii.cpp では、チャンネル A のつなぎ先の名前が "printer" になっている)
  * 使うのは一度に 1 つ。使っていない方のチャンネルの割り込みは止めておく。
  *
- * SCC の番地はローメモリ変数 SCCRd ($1D8)。1 バイトずつ、B の制御 +0, A の制御 +2, B のデータ +4,
+ * SCC のアドレスはローメモリ変数 SCCRd ($1D8)。1 バイトずつ、B の制御 +0, A の制御 +2, B のデータ +4,
  * A のデータ +6。制御のレジスタは「番号を書いてから読む / 書く」(0 番はそのまま)。
  * WR9 (割り込みの全体の許可とリセット) と RR3 (割り込みの要因) は 2 つのチャンネルで 1 つ
  * (RR3 はチャンネル A の側からだけ読める)。
@@ -30,7 +30,7 @@
 uint16_t irq_disable(void);         /* platform.c */
 void irq_restore(uint16_t sr);
 
-/* チャンネルごとの番地 (SCCRd からの位置) と、RR3 の要因のビット、WR9 のリセットの命令 */
+/* チャンネルごとのアドレス (SCCRd からの位置) と、RR3 の要因のビット、WR9 のリセットの命令 */
 static const struct {
     uint8_t ctrl, data, rx_ip, tx_ip, ext_ip, reset;
 } chan[2] = {
@@ -57,7 +57,7 @@ static const struct {
 static volatile uint8_t *scc;
 static int cur_port = -1;           /* 使っているチャンネル (-1 = なし) */
 static uint32_t cur_baud;
-static uint8_t ctrl, data;          /* 使っているチャンネルの番地 */
+static uint8_t ctrl, data;          /* 使っているチャンネルのアドレス */
 static volatile uint8_t rx_buf[RX_SIZE], tx_buf[TX_SIZE];
 static volatile uint16_t rx_head, rx_tail, tx_head, tx_tail;
 static volatile struct serial_stats stats;

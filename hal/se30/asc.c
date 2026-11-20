@@ -54,7 +54,7 @@ void asc_init(asc_render_fn fn, int v)
     render = fn;
 
     /* 音量。ふだんは Mac OS のサウンドの処理が設定するので、ROM が起動音のあとに残した値のままだと
-       鳴らないことがある (実機で確かめた。MAME は音量を再現していない) */
+       鳴らないことがある (実機で確認した。MAME は音量を再現していない) */
     asc_set_volume(v);
 
     asc[ASC_MODE] = 1;                  /* FIFO モード */

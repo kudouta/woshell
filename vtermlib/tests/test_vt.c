@@ -1,6 +1,6 @@
 /**
  * @file test_vt.c
- * @brief 端末の中身 (vtcore.c) を PC で確かめる。make test
+ * @brief 端末の中身 (vtcore.c) を PC で確認する。make test
  *
  * 描く側 (vtdraw.c) の代わりに何もしない関数をつなぎ、シーケンスを流して文字の表と返事を調べる。
  */

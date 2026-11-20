@@ -1,6 +1,6 @@
 /**
  * @file keyboard.h
- * @brief キーボード (機種に依存しない入口)
+ * @brief キーボード (機種に依存しないインターフェース)
  *
  * 文字のキーは ASCII で返す (Shift, Caps Lock, Control を反映。Control + 英字は 1-26)。
  * Return は '\\r'、Delete (後退) は 0x7F、Tab は '\\t'、Esc は 0x1B。

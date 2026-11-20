@@ -1,10 +1,10 @@
-# hal - 機種の層 (入口のヘッダーと、機種ごとの実装)
+# hal - 機種のレイヤー (インターフェースのヘッダーと、機種ごとの実装)
 # Linux で実行する:  make  (Windows では wsl make のように WSL から)
 #   作るもの:
 #     build/lib$(MACHINE).a  機種の実装 ($(MACHINE)/*.c, *.S) と、CPU の実装 ($(CPU)/*.c)
-#     build/crt0.o           プログラムの入口 (リンクのときに先頭に置く。ライブラリーには入れない)
-#     build/boot.bin         フロッピーの起動ブロック (プログラムを LOAD_ADDR に読み込む)
-#   使う側は include/ と $(MACHINE)/ をインクルードの場所に入れ、$(MACHINE)/stage2.ld でリンクする
+#     build/crt0.o           プログラムのエントリーポイント (リンクのときに先頭に置く。ライブラリーには入れない)
+#     build/boot.bin         フロッピーのブートブロック (プログラムを LOAD_ADDR に読み込む)
+#   使う側は include/ と $(MACHINE)/ をインクルードパスに入れ、$(MACHINE)/stage2.ld でリンクする
 #   MACHINE=se30  機種 (今は se30 だけ)
 #   CPU=m68030    CPU (MMU など、CPU ごとの部分。今は m68030 だけ)
 

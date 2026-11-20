@@ -2,18 +2,18 @@
  * @file mmu.c
  * @brief 68030 の MMU (PMMU) とキャッシュの状態を表示する (cpu.h。調査用)
  *
- * レジスタ (TC, CRP, SRP, TT0, TT1, CACR) を pmove / movec で読み、変換の表をたどって、
- * 論理番地から物理番地への対応を、続いている範囲ごとにまとめて表示する。表は読むだけで書き換えない。
+ * レジスタ (TC, CRP, SRP, TT0, TT1, CACR) を pmove / movec で読み、変換テーブルをたどって、
+ * 論理アドレスから物理アドレスへの対応を、続いている範囲ごとにまとめて表示する。表は読むだけで書き換えない。
  *
  * 68030 の変換 (MC68030 User's Manual 9 章):
  *   TC   E(31) 有効, SRE(25) スーパーバイザーは SRP を使う, FCL(24) 最初の段を機能コードで引く,
  *        PS(23-20) ページの大きさ 2^PS, IS(19-16) 無視する上位のビット数, TIA-TID(15-0) 各段の索引のビット数
- *   CRP / SRP (64 ビット) 上位: L/U(31) LIMIT(30-16) DT(1-0)、下位: 表の番地
+ *   CRP / SRP (64 ビット) 上位: L/U(31) LIMIT(30-16) DT(1-0)、下位: 表のアドレス
  *   記述子の DT: 0 = 無効, 1 = ページ (途中の段なら、その段で打ち切った大きなかたまり), 2 = 短い形 (4 バイト) の表,
  *        3 = 長い形 (8 バイト) の表。最後の段で 2 / 3 なら、ページの記述子を指す間接の記述子
- *   短い形のページの記述子: 番地(31-8) CI(6) M(4) U(3) WP(2) DT(1-0)。長い形は 1 語目に S(8) CI WP DT、2 語目に番地
- *   TT0 / TT1 (素通し): 論理番地の上位 8 ビット BASE(31-24) と MASK(23-16) が合えば変換しない。E(15) CI(10)
- * 表の中の番地は物理番地。ここでは論理番地と同じとみなして読む (表の置き場所が 1 対 1 に変換されていない
+ *   短い形のページの記述子: アドレス(31-8) CI(6) M(4) U(3) WP(2) DT(1-0)。長い形は 1 語目に S(8) CI WP DT、2 語目にアドレス
+ *   TT0 / TT1 (トランスペアレント変換): 論理アドレスの上位 8 ビット BASE(31-24) と MASK(23-16) が合えば変換しない。E(15) CI(10)
+ * 表の中のアドレスは物理アドレス。ここでは論理アドレスと同じとみなして読む (表の置き場所が 1 対 1 に変換されていない
  * 場合は、正しく読めない。そのときは表示の最後に知らせる)。
  * 表をたどるのは、スーパーバイザーのデータ (機能コード 5) の場合。
  */
@@ -99,7 +99,7 @@ static void decode_tc(uint32_t tc, struct layout *l)
     }
 }
 
-/* TT0 / TT1 が番地 addr (スーパーバイザーのデータ) に当てはまるか */
+/* TT0 / TT1 がアドレス addr (スーパーバイザーのデータ) に当てはまるか */
 static int tt_match(uint32_t tt, uint32_t addr)
 {
     if (!(tt & 0x8000))
@@ -135,7 +135,7 @@ static struct {
     int flags;
 } run;
 static int ranges;
-static uint32_t table_lo = 0xFFFFFFFFu, table_hi;   /* 読んだ表の番地の範囲 */
+static uint32_t table_lo = 0xFFFFFFFFu, table_hi;   /* 読んだ表のアドレスの範囲 */
 
 static void flush_run(void)
 {
@@ -163,7 +163,7 @@ static void emit(uint32_t la, uint32_t pa, uint64_t len, int flags)
     run.flags = flags;
 }
 
-/* 記述子を読む。dt と番地と印を返す */
+/* 記述子を読む。dt とアドレスと印を返す */
 static void read_desc(uint32_t at, int longfmt, int *dt, uint32_t *addr, int *flags)
 {
     if (at < table_lo)
@@ -183,7 +183,7 @@ static void read_desc(uint32_t at, int longfmt, int *dt, uint32_t *addr, int *fl
     }
 }
 
-/* 段 level の表 (番地 table, 形 longfmt) をたどる。la は、この表が受け持つ論理番地の始まり */
+/* 段 level の表 (アドレス table, 形 longfmt) をたどる。la は、この表が受け持つ論理アドレスの始まり */
 static void walk(const struct layout *l, int level, uint32_t table, int longfmt, uint32_t la, int used, int flags_in)
 {
     const int n = l->ti[level];
@@ -270,7 +270,7 @@ void cpu_mmu_report(void)
         printf("note: TT0/TT1 ranges bypass the tables above\n");
 }
 
-/* ---- 物理番地の窓 (TT1) ---- */
+/* ---- 物理アドレスの窓 (TT1) ---- */
 
 static uint32_t saved_tt1;
 static int window_on;

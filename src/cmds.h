@@ -2,7 +2,7 @@
  * @file cmds.h
  * @brief シェルの組み込みのコマンド (cmds.c)
  *
- * コマンドの関数は cmd_ で始まる。記号の表には cmd_ を外した名前でも入るので (tools/common/mksymtab.py)、
+ * コマンドの関数は cmd_ で始まる。シンボルテーブルには cmd_ を外した名前でも入るので (tools/common/mksymtab.py)、
  * シェルでは help、d 0x80000 のように短い名前で呼べる。
  * 引数はシェルから 32 ビットの整数で渡り、省略した引数は 0 になる。
  */
@@ -39,15 +39,15 @@ int cmd_beep(int hz, int ms);
 
 /**
  * @brief MMU とキャッシュの状態を出す (調査用。何も書き換えない)
- * @param addr 0 ならレジスタと変換の表のあらまし。0 以外なら、その論理番地の変換
+ * @param addr 0 ならレジスタと変換テーブルのあらまし。0 以外なら、その論理アドレスの変換
  * @return 0
  */
 int cmd_mmu(uint32_t addr);
 
 /**
  * @brief 物理 RAM がどこにあるかを調べて出す (調査用。書いた値はすぐ元に戻す)
- * @param start 調べ始める物理番地 (0 なら、使っている RAM (MemTop) の次から)
- * @param end   調べ終える物理番地の次 (0 なら、機種の RAM の空間の終わりまで)
+ * @param start 調べ始める物理アドレス (0 なら、使っている RAM (MemTop) の次から)
+ * @param end   調べ終える物理アドレスの次 (0 なら、機種の RAM の空間の終わりまで)
  * @return 0
  */
 int cmd_ramscan(uint32_t start, uint32_t end);
@@ -105,7 +105,7 @@ int cmd_setdate(int y, int mo, int d, int h, int mi, int s);
 
 /**
  * @brief PRAM を表示する
- * @param addr 最初の番地 (0-255。範囲の外なら 0)
+ * @param addr 最初のアドレス (0-255。範囲の外なら 0)
  * @param n    バイト数 (0 か、最後を越えるなら最後まで)
  * @return 0
  */
@@ -113,9 +113,9 @@ int cmd_pram(int addr, int n);
 
 /**
  * @brief PRAM を 1 バイト書き換える
- * @param addr 番地 (0-255)
+ * @param addr アドレス (0-255)
  * @param v    値 (0-255)
- * @return 書いた後に読み直した値。番地か値が範囲の外なら -1
+ * @return 書いた後に読み直した値。アドレスか値が範囲の外なら -1
  */
 int cmd_pramw(int addr, int v);
 
@@ -155,7 +155,7 @@ int cmd_scrbench(int lines);
 
 /**
  * @brief メモリを表示する
- * @param addr  最初の番地 (0 なら前の続き。最初は 0x80000)
+ * @param addr  最初のアドレス (0 なら前の続き。最初は 0x80000)
  * @param n     表示する数 (0 なら 128 バイト分)
  * @param width 1 つの大きさ (1, 2, 4。ほかの値なら前と同じ。最初は 2)
  * @return 0
@@ -164,7 +164,7 @@ int cmd_d(uint32_t addr, int n, int width);
 
 /**
  * @brief メモリを書き換える (16 進で入力。Enter で次、'.' で終わり)
- * @param addr  最初の番地
+ * @param addr  最初のアドレス
  * @param width 1 つの大きさ (1, 2, 4。ほかの値なら 2)
  * @return 0
  */
@@ -179,13 +179,13 @@ int cmd_mem(void);
 /**
  * @brief メモリを取る (プログラムの後ろから順に切り出すだけ。返さない)
  * @param n バイト数 (16 バイト単位に切り上げる)
- * @return 番地 (16 バイト境界)。足りなければ 0
+ * @return アドレス (16 バイト境界)。足りなければ 0
  */
 void *malloc(uint32_t n);
 
 /**
  * @brief 何もしない (malloc は返す仕組みを持たない)
- * @param p malloc が返した番地
+ * @param p malloc が返したアドレス
  */
 void free(void *p);
 

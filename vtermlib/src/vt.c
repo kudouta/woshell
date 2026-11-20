@@ -1,6 +1,6 @@
 /**
  * @file vt.c
- * @brief 端末の入口 (vt.h)。中身 (vtcore.c)、描く側 (vtdraw.c)、キーボードをつなぐ
+ * @brief 端末のインターフェース (vt.h)。中身 (vtcore.c)、描く側 (vtdraw.c)、キーボードをつなぐ
  */
 #include "vt.h"
 #include "vtcore.h"

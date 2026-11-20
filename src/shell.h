@@ -40,9 +40,9 @@ void shell_history(void);
 void shell_vars(void);
 
 /**
- * @brief 番地を含む関数を記号の表から探す (例外の表示などに使う)
- * @param pc 番地
- * @return 番地が pc 以下でいちばん近い関数の記号。プログラムの命令の外なら 0
+ * @brief アドレスを含む関数をシンボルテーブルから探す (例外の表示などに使う)
+ * @param pc アドレス
+ * @return アドレスが pc 以下でいちばん近い関数のシンボル。プログラムの命令の外なら 0
  */
 const struct symtab_entry *shell_sym_near(uint32_t pc);
 

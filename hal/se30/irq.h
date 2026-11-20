@@ -2,8 +2,8 @@
  * @file irq.h
  * @brief SE/30 の割り込み (SE/30 の中だけで使う)
  *
- * 割り込みの入口 (vectors.S) から呼ばれる処理と、割り込みを止める / 戻す関数。
- * 割り込みの回数などの記録は、機種に依存しない入口 platform.h の platform_irq_* で読む。
+ * 割り込みのエントリー (vectors.S) から呼ばれる処理と、割り込みを止める / 戻す関数。
+ * 割り込みの回数などの記録は、機種に依存しないインターフェース platform.h の platform_irq_* で読む。
  */
 #ifndef SE30_IRQ_H
 #define SE30_IRQ_H

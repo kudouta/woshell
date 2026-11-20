@@ -1,6 +1,6 @@
 /**
  * @file machine.h
- * @brief SE/30 の定数 (src/include の入口から使う)
+ * @brief SE/30 の定数 (hal/include のインターフェースから使う)
  */
 #ifndef MACHINE_H
 #define MACHINE_H

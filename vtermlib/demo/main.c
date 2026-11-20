@@ -35,7 +35,7 @@ void trap_fatal(const struct trap_info *info)
     vt_flush();
 }
 
-/* ---- 小さな道具 ---- */
+/* ---- 小さなツール ---- */
 
 /* 垂直同期 n 回分待つ (その間も画面に反映する) */
 static void pause_frames(int n)

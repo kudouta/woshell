@@ -1,6 +1,6 @@
 /**
  * @file platform.h
- * @brief 機種の機能の入口 (機種に依存しない部分は hal/include の入口だけを使う)
+ * @brief 機種の機能のインターフェース (機種に依存しない部分は hal/include のインターフェースだけを使う)
  *
  * 機種ごとの実装は hal/<機種>/ にある。機種の定数 (画面の大きさ, 時計の速さ, 名前) は
  * 同じフォルダーの machine.h にあり、Makefile の MACHINE で選ぶ。
@@ -80,9 +80,9 @@ int platform_startup_icon(uint32_t bits[32]);
 /**
  * @brief 物理 RAM がどこにあるかを調べて表示する (調査用)
  *
- * 1MB ごとに、RAM があるか、別の番地の写り込みかを調べる。各ブロックで書いた値はすぐ元に戻す。
- * @param start 調べ始める物理番地 (0 なら、使っている RAM (MemTop) の次から)
- * @param end   調べ終える物理番地の次 (0 なら、機種の RAM の空間の終わりまで)
+ * 1MB ごとに、RAM があるか、別のアドレスのミラーかを調べる。各ブロックで書いた値はすぐ元に戻す。
+ * @param start 調べ始める物理アドレス (0 なら、使っている RAM (MemTop) の次から)
+ * @param end   調べ終える物理アドレスの次 (0 なら、機種の RAM の空間の終わりまで)
  */
 void platform_ram_scan(uint32_t start, uint32_t end);
 

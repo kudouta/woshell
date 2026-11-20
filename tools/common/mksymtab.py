@@ -1,10 +1,10 @@
-"""nm の出力から記号の表 (C のソース) を作る (標準ライブラリだけで動く)。
+"""nm の出力からシンボルテーブル (C のソース) を作る (標準ライブラリだけで動く)。
 
   m68k-linux-gnu-nm stage2.elf > syms.txt
   python3 tools/common/mksymtab.py syms.txt symtab.c
 
-外から見える記号 (nm の型が大文字の T, D, B, R) だけを、名前の順に並べる。
-'_' 2 つで始まる記号 (リンカが作るもの) は除く。
+外から見えるシンボル (nm の型が大文字の T, D, B, R) だけを、名前の順に並べる。
+'_' 2 つで始まるシンボル (リンカが作るもの) は除く。
 シェルのコマンドの関数 (cmd_ で始まる関数) は、cmd_ を外した名前でも登録する (型 'C')。
 シェルでは cmd_help も help も同じ関数を指す。
 引数を 1 つだけ渡すと、空の表を作る (1 回目のリンク用)。
@@ -30,7 +30,7 @@ def read_syms(path):
         if typ == "T" and name.startswith(CMD_PREFIX) and len(name) > len(CMD_PREFIX):
             short = name[len(CMD_PREFIX):]
             if short in syms:
-                raise SystemExit(f"{path}: コマンド {name} の短い名前 {short} がほかの記号とぶつかる")
+                raise SystemExit(f"{path}: コマンド {name} の短い名前 {short} がほかのシンボルとぶつかる")
             syms[short] = (addr, "C")
     return syms
 
