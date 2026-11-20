@@ -19,6 +19,7 @@
 #include "beep.h"
 #include "cpu.h"
 #include "serial.h"
+#include "version.h"                    /* build/version.h (Makefile が VERSION と git から作る) */
 
 extern char _start[], __bss_end[], __stack_top[];     /* stage2.ld */
 
@@ -65,7 +66,12 @@ int cmd_help(void)
 
 int cmd_version(void)
 {
-    printf("woshell for " MACHINE_NAME " (bare metal) - built " __DATE__ " " __TIME__ "\n");
+    /* 例: woshell 0.1.0 (v0.1.0-2-g1a2b3c4-dirty) for SE/30 - built Nov 21 2026
+       かっこの中は git describe の結果。タグの版そのものなら出さない */
+    printf("woshell " WOSHELL_VERSION);
+    if (WOSHELL_GIT[0])
+        printf(" (" WOSHELL_GIT ")");
+    printf(" for " MACHINE_NAME " - built " __DATE__ "\n");
     return 0;
 }
 

@@ -18,6 +18,10 @@ NM      := $(CROSS)nm
 
 LOAD_ADDR ?= 0x00080000
 
+# 版 (VERSION ファイル) と、git describe の結果 (git がなければ空。タグと同じなら省く)
+VERSION  := $(shell cat VERSION)
+GIT_DESC := $(filter-out v$(VERSION),$(shell git describe --tags --always --dirty 2>/dev/null))
+
 HAL  := hal
 VT   := vtermlib
 LIBC := libc
@@ -62,6 +66,13 @@ $(LIBC_OUT): FORCE
 $(B)/obj/%.o: src/%.c $(HEADERS) | $(VT_OUT)
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+# 版の値を build/version.h に書く。中身が変わったときだけ書き換える (変わらなければ作り直しは起きない)
+$(B)/version.h: FORCE
+	@mkdir -p $(@D)
+	@printf '#define WOSHELL_VERSION "%s"\n#define WOSHELL_GIT "%s"\n' '$(VERSION)' '$(GIT_DESC)' > $@.tmp
+	@if cmp -s $@.tmp $@; then rm -f $@.tmp; else mv $@.tmp $@; fi
+$(B)/obj/cmds.o: $(B)/version.h
 
 # ---- シンボルテーブル (関数や変数を名前で呼ぶため) ----
 # 表を入れると大きさが変わってアドレスがずれるので、3 回リンクする:

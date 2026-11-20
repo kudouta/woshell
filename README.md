@@ -73,6 +73,7 @@ wsl make -C vtermlib    # 端末デモ vtermlib/build/vterm1440.img を生成
 | `build/stage2.bin` | フロッピーに入れるプログラム（`stage2.elf` から情報を落としたもの） |
 | `build/stage2.lst` | 逆アセンブルとソースを並べたもの |
 | `build/syms.txt` | シンボルの一覧（`nm` の結果） |
+| `build/version.h` | 版と `git describe` の結果（「版」を参照） |
 | `hal/build/libse30.a`、`crt0.o`、`boot.bin` | SE/30依存レイヤー、スタートアップ（エントリーポイント）、ブートブロック |
 | `vtermlib/build/libvterm.a` | 端末ライブラリー（フォントも入る） |
 | `libc/build/libc.a` | 自前の小さな C ライブラリー |
@@ -132,6 +133,18 @@ mame macse30 -printer null_modem -bitb1 socket.127.0.0.1:2333 -modem null_modem 
 3. 2 のアドレスでテーブルを作ってリンクします。2 と 3 のアドレスが同じことを確認し、違えば止まります。
 
 テーブルは `tools/common/mksymtab.py` が作ります。`cmd_` で始まる関数は、`cmd_` を外した名前でもテーブルに入ります。
+
+## 版
+
+版の番号は `MAJOR.MINOR.PATCH` の形で、一番上の `VERSION` ファイルにだけ書きます。まだ実験的なので 0.x です。機能を足したら MINOR を、直しだけなら PATCH を上げます。版を出すときは、`VERSION` を書き換えてコミットし、`v0.1.0` のようなタグを付けます。
+
+ビルドすると、Makefile が `VERSION` と `git describe --tags --always --dirty` の結果を `build/version.h` に書きます。起動したときと `version` コマンドで、次のように表示されます。
+
+```
+woshell 0.1.0 (v0.1.0-2-g1a2b3c4-dirty) for SE/30 - built Nov 21 2026
+```
+
+かっこの中は、タグからいくつ後のコミット（2）、どのコミットか（1a2b3c4）、コミットしていない変更があるか（dirty）を表します。タグを付けたコミットそのものからビルドすると、かっこは出ません。git のないところでビルドしたときも出ません。
 
 ## フォルダー
 
